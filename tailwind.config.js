@@ -13,7 +13,7 @@ module.exports = {
         grayCo: "#9699ab",
         grayLi: "#d6d9e6",
         Magnolia: "#f0f6ff",
-        Alabaster: "##fafbff",
+        Alabaster: "#fafbff",
         White: "#ffffff",
       },
     },

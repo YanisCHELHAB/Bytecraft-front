@@ -4,12 +4,11 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { z } from "zod";
-
-type dataProps = {
-  name: string;
-  email: string;
-  num: string;
-};
+import Cards from "./Cards";
+import { useOfferState } from "./Zustand/store";
+import ToggleSwitch from "./ToggleSwitch";
+import PricingToggle from "./ToggleSwitch";
+import CheckboxCard from "./Checkbox";
 
 const Settings = () => {
   const schema = z.object({
@@ -41,11 +40,25 @@ const Settings = () => {
     console.log(data);
   };
   const next = async () => {
-    const isPage1Valid = await trigger(["name", "email", "num"]);
-    if (isPage1Valid) {
-      setStep("2");
+    if (step === "1") {
+      const isPage1Valid = await trigger(["name", "email", "num"]);
+      if (isPage1Valid) {
+        setStep("2");
+      }
+    }
+    if (step === "2") {
+      setStep("3");
+    }
+    if (step === "3") {
+      setStep("4");
     }
   };
+  const { offer, SetChosenOffer, billing } = useOfferState();
+
+  const handleCardClick = (selectedOffer: string) => {
+    SetChosenOffer(selectedOffer);
+  };
+
   const onSubmitWrapper = () => {
     const onSubmit: SubmitHandler<FormFields> = async () => {
       console.log("jioahoa");
@@ -53,11 +66,11 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-orange-200">
+    <div className="flex justify-center items-center min-h-screen bg-blueLi">
       <section className="h-fit w-[60vw] rounded-lg shadow-[0_3px_10px_rgb(0,0,0,0.2)] bg-white flex  ">
-        <div className=" m-3 flex-[2] relative  ">
+        <div className=" m-3  relative  ">
           <img src="public/assets/images/bg-sidebar-desktop.svg" />
-          <div className="flex flex-col my-10 pl-8 text-white absolute top-0">
+          <div className="flex flex-col my-10 pl-8 text-white absolute top-0 ">
             <div
               className="flex items-center mb-5 cursor-pointer "
               onClick={(e: React.MouseEvent<HTMLHeadingElement, MouseEvent>) =>
@@ -188,53 +201,40 @@ const Settings = () => {
             </div>
           </div>
         </div>
-        <div className=" mt-12 flex-[3] px-10">
-          {step === "1" ? (
-            <div>
-              <p className="mb-1  block text-3xl font-bold text-blueMa">
-                Personal info
-              </p>
-              <p className="text-grayCo">
-                Please provide your name, email address, and phone number.
-              </p>
-            </div>
-          ) : step === "2" ? (
-            <div>
-              <p className="mb-1  block text-3xl font-bold text-blueMa">
-                Select your plan
-              </p>
-              <p className="text-grayCo">
-                You have the option of monthly or yearly billing.
-              </p>
-            </div>
-          ) : step === "4" ? (
-            <h2 className=" mb-6  ">Se deconnecter</h2>
-          ) : (
-            ""
-          )}
-          <div className="">
-            <form
-              className="flex flex-col gap-3 pt-12  text-blueMa font-normal"
-              onSubmit={handleSubmit(onSubmit)}
-            >
-              {step === "1" && (
-                <div className=" space-y-4 flex flex-col">
-                  <div className="flex justify-between">
-                    <label className=" text-sm text-greytext font-body">
-                      Name
-                    </label>
-                    {errors.name && (
-                      <p className="text-red-600-400 text-sm pt-1 px-1">
-                        {"Insert your name"}
-                      </p>
-                    )}
+        <div className=" mt-12 flex-[3] px-20  ">
+          <form
+            className="flex flex-col text-blueMa font-normal "
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            {step === "1" && (
+              <div className=" ">
+                <div>
+                  <p className="mb-1  block text-3xl font-bold text-blueMa">
+                    Personal info
+                  </p>
+                  <p className="text-grayCo">
+                    Please provide your name, email address, and phone number.
+                  </p>
+                </div>
+                <div className="space-y-4 flex flex-col mt-8">
+                  <div className="">
+                    <div className="flex justify-between">
+                      <label className=" text-sm text-greytext font-body">
+                        Name
+                      </label>
+                      {errors.name && (
+                        <p className="text-red-600 text-sm pt-1 px-1">
+                          {"Insert your name"}
+                        </p>
+                      )}
+                    </div>
+                    <input
+                      {...register("name")}
+                      type="text"
+                      className=" w-full  mt-1 bg-white border border-grayCo rounded-md py-2 px-4 font-medium"
+                      placeholder="e.g. Stephen King"
+                    />
                   </div>
-                  <input
-                    {...register("name")}
-                    type="text"
-                    className=" w-full  mt-1 bg-white border border-grayCo rounded-md py-2 px-4 font-medium"
-                    placeholder="e.g. Stephen King"
-                  />
 
                   <div className="">
                     <div className="flex justify-between">
@@ -269,105 +269,107 @@ const Settings = () => {
                       className="input w-full mt-1 bg-white border border-grayCo rounded-md py-2 px-4 font-medium"
                       placeholder="e.g. +123456789"
                     />
-
-                    <button
-                      className=" bg-blueMa  text-white w-fit py-2 px-5 rounded-lg mt-28 self-end"
-                      type="submit"
-                      onClick={(e) => {
-                        next();
-                      }}
-                    >
-                      Next Step
-                    </button>
                   </div>
                 </div>
-              )}
-              {step === "2" && (
-                <div className="px-12  py-12 flex flex-col">
-                  <h2 className="mb-4 font-body">Votre attention !</h2>
-                  <p className="text-base font-body">
-                    Nous sommes désolés de vous voir partir. La suppression de
-                    votre compte est définitive et vous perdrez toutes vos
-                    données. Si vous avez des soucis ou des questions, nous
-                    sommes là pour vous aider. Êtes-vous certain de vouloir
-                    supprimer votre compte ?
-                  </p>
-                  <div className="self-end mt-12 max-md:mt-5">
-                    {" "}
-                    <button
-                      onClick={(e) => {
-                        console.log("hakjak");
-                      }}
-                      className="btn text-base w-fit bg-white active:bg-greyTwo mr-4 border-solid font-body border-grey "
-                      type="submit"
-                    >
-                      Annuler
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        console.log("hakjaaaaaak");
-                      }}
-                      className="btn text-base w-fit bg-red text-white font-body "
-                      type="submit"
-                    >
-                      Supprimer
-                    </button>
-                    {errors.root && (
-                      <p className="text-red-500">{errors.root.message}</p>
-                    )}
-                  </div>
-                </div>
-              )}
-              {step === "4" && (
-                <div className="px-12  py-12 flex flex-col">
-                  <p className="text-base font-body">
-                    Êtes-vous sûr de vouloir vous déconnecter ? Vous devrez vous
-                    reconnecter pour accéder à nouveau à votre compte et à vos
-                    informations de location.
-                  </p>
-
-                  <div className="self-end mt-5">
-                    {" "}
-                    <button
-                      onClick={(e) => {
-                        console.log("hakjaaaaaaaaaaak");
-                      }}
-                      className="btn text-base w-fit bg-white active:bg-greyTwo mr-4 border-solid font-bodyborder-grey "
-                      type="submit"
-                    >
-                      Annuler
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        console.log("hakjadlhaodhaoak");
-                      }}
-                      className="btn text-base w-fit bg-blue active:bg-blueActive text-white font-body"
-                      type="submit"
-                    >
-                      Se deconnecter
-                    </button>
-                    {errors.root && (
-                      <p className="text-red-500">{errors.root.message}</p>
-                    )}
-                  </div>
-                </div>
-              )}
-              <div className="flex justify-end">
-                {" "}
-                {step !== "1" && (
-                  <button
-                    className=" w-fit  active:bg-blueActive text-grayCo"
-                    type="submit"
-                  >
-                    Go Back
-                  </button>
-                )}
-                {errors.root && (
-                  <p className="text-red-500">{errors.root.message}</p>
-                )}
               </div>
-            </form>
-          </div>
+            )}
+            {step === "2" && (
+              <div className="flex flex-col">
+                <div>
+                  <p className="mb-1  block text-3xl font-bold text-blueMa">
+                    Select your plan
+                  </p>
+                  <p className="text-grayCo">
+                    You have the option of monthly or yearly billing.
+                  </p>
+                </div>
+                <div className="flex space-x-5 mt-8 mb-12">
+                  <Cards
+                    icon="../public/assets/images/icon-arcade.svg"
+                    title="Arcade"
+                    price={9}
+                    onClick={() => handleCardClick("Arcade")}
+                    selected={offer === "Arcade"}
+                  />
+                  <Cards
+                    icon="../public/assets/images/icon-advanced.svg"
+                    title="Advanced"
+                    price={12}
+                    onClick={() => handleCardClick("Advanced")}
+                    selected={offer === "Advanced"}
+                  />
+                  <Cards
+                    icon="../public/assets/images/icon-pro.svg"
+                    title="Pro"
+                    price={15}
+                    onClick={() => handleCardClick("Pro")}
+                    selected={offer === "Pro"}
+                  />
+                </div>
+                <PricingToggle />
+              </div>
+            )}
+            {step === "3" && (
+              <div className=" flex flex-col">
+                <div>
+                  <p className="mb-1  block text-3xl font-bold text-blueMa">
+                    Pick add-ons
+                  </p>
+                  <p className="text-grayCo">
+                    Add-ons help enhance your gaming experience
+                  </p>
+                </div>
+                <div className="mt-8">
+                  <CheckboxCard
+                    title="Online Service"
+                    description="Access to multiplayer games"
+                    price={billing === "monthly" ? 1 : 10}
+                    checkboxKey="Online"
+                  />
+                  <CheckboxCard
+                    title="Larger Storage"
+                    description="Extra 1TB of cloud save"
+                    price={billing === "monthly" ? 2 : 20}
+                    checkboxKey="Storage"
+                  />
+                  <CheckboxCard
+                    title="Customizable Profil"
+                    description="Custom the on your profil"
+                    price={billing === "monthly" ? 2 : 20}
+                    checkboxKey="Custom"
+                  />
+                </div>
+              </div>
+            )}
+            <div className="flex items-center justify-between">
+              {" "}
+              {/* {step !== "1" && ( */}
+              <button
+                className=" w-fit  active:bg-blueActive text-grayCo"
+                type="submit"
+              >
+                Go Back
+              </button>
+              {/* )} */}
+              {errors.root && (
+                <p className="text-red-500">{errors.root.message}</p>
+              )}
+              <button
+                className={` bg-blueMa  text-white w-fit py-2 px-5 rounded-lg cursor-pointer self-end ${
+                  step === "2" && offer == null
+                    ? "bg-grayCo cursor-not-allowed"
+                    : ""
+                }`}
+                disabled={offer== null && step==="2"}
+                type="submit"
+                onClick={(e) => {
+                  next();
+                }}
+              >
+                Next Step
+              </button>
+            </div>
+          </form>
         </div>
       </section>
     </div>
