@@ -35,7 +35,7 @@ const CheckboxCard = ({
       <div className="flex items-center space-x-4 ">
         <div
           className={`h-5 w-5 bg-white border-grayLi border rounded-md flex items-center justify-center ${
-            isChecked ? "bg-purple-600 border-none" : ""
+            isChecked ? "bg-purple-500 border-none" : ""
           }`}
         >
           {isChecked && <img src="../public/assets/images/icon-checkmark.svg" alt="" />}
