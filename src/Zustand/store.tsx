@@ -1,26 +1,47 @@
 import { create } from "zustand";
 
 interface OfferState {
-  offer: string | null;
-  SetChosenOffer: (offer: string) => void;
-  billing: 'monthly' | 'yearly';
+  offer: "Arcade" | "Advanced" | "Pro" | null;
+  MofferPrices: {
+    Arcade: number;
+    Advanced: number;
+    Pro: number;
+  };
+  Mbilling: {
+    "Larger storage": number;
+    "Customizable profil": number;
+    "Online service": number;
+  };
+
+  SetChosenOffer: (offer: "Arcade" | "Advanced" | "Pro" | null) => void;
+  billing: "Monthly" | "Yearly";
   togglePricing: () => void;
   selectedAddOns: string[]; // Array to store selected add-on keys
   toggleAddOn: (addOnKey: string) => void;
-  
 }
 
 export const useOfferState = create<OfferState>((set) => ({
   offer: null,
-  billing: "monthly",
+  billing: "Monthly",
   selectedAddOns: [],
+  MofferPrices: {
+    Arcade: 9,
+    Advanced: 12,
+    Pro: 15
+  },
+  Mbilling: {
+    "Larger storage": 2,
+    "Customizable profil": 2,
+    "Online service": 1
+  },
 
-  SetChosenOffer: (offer: string) => {
+  SetChosenOffer: (offer:"Arcade" | "Advanced" | "Pro" | null) => {
     set({ offer });
   },
-  togglePricing: () => set((state) => ({
-    billing: state.billing === 'monthly' ? 'yearly' : 'monthly'
-  })),
+  togglePricing: () =>
+    set((state) => ({
+      billing: state.billing === "Monthly" ? "Yearly" : "Monthly",
+    })),
   toggleAddOn: (addOnKey: string) => {
     set((state) => {
       const newSelectedAddOns = [...state.selectedAddOns];

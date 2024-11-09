@@ -6,7 +6,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import Cards from "./Cards";
 import { useOfferState } from "./Zustand/store";
-import ToggleSwitch from "./ToggleSwitch";
 import PricingToggle from "./ToggleSwitch";
 import CheckboxCard from "./Checkbox";
 
@@ -40,47 +39,85 @@ const Settings = () => {
     console.log(data);
   };
   const next = async () => {
-    if (step === "1") {
-      const isPage1Valid = await trigger(["name", "email", "num"]);
-      if (isPage1Valid) {
-        setStep("2");
-      }
-    }
-    if (step === "2") {
-      setStep("3");
-    }
-    if (step === "3") {
-      setStep("4");
+    const isPage1Valid = await trigger(["name", "email", "num"]);
+    switch (step) {
+      case "1":
+        if (isPage1Valid) {
+          setStep("2");
+        }
+        break;
+      case "2":
+        setStep("3");
+        break;
+      case "3":
+        setStep("4");
+        break;
+      case "4":
+        setStep("5");
+        break;
     }
   };
-  const { offer, SetChosenOffer, billing } = useOfferState();
+  const {
+    offer,
+    SetChosenOffer,
+    billing,
+    MofferPrices,
+    Mbilling,
+    selectedAddOns,
+  } = useOfferState();
 
-  const handleCardClick = (selectedOffer: string) => {
+  const handleCardClick = (
+    selectedOffer: "Arcade" | "Advanced" | "Pro" | null
+  ) => {
     SetChosenOffer(selectedOffer);
   };
-
+  const pricing = () => {
+    if (billing === "Monthly") {
+      return `$${MofferPrices[offer]}/mo`;
+    }
+    return `$${MofferPrices[offer] * 10}/yr`;
+  };
+  const Total = () => {
+    let count = 0;
+    selectedAddOns.forEach((add) => {
+      count += Mbilling[add as keyof typeof Mbilling];
+    });
+    if (billing === "Monthly") {
+      return `$${MofferPrices[offer] + count}/mo`;
+    }
+    return `$${(MofferPrices[offer] + count) * 10}/yr`;
+  };
   const onSubmitWrapper = () => {
     const onSubmit: SubmitHandler<FormFields> = async () => {
       console.log("jioahoa");
     };
   };
 
+  function back() {
+    switch (step) {
+      case "2":
+        setStep("1");
+        break;
+      case "3":
+        setStep("2");
+        break;
+      case "4":
+        setStep("3");
+        break;
+    }
+  }
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-blueLi">
-      <section className="h-fit w-[60vw] rounded-lg shadow-[0_3px_10px_rgb(0,0,0,0.2)] bg-white flex  ">
+      <section className=" w-[60vw] rounded-lg shadow-[0_3px_10px_rgb(0,0,0,0.2)] bg-white flex   ">
         <div className=" m-3  relative  ">
           <img src="public/assets/images/bg-sidebar-desktop.svg" />
           <div className="flex flex-col my-10 pl-8 text-white absolute top-0 ">
-            <div
-              className="flex items-center mb-5 cursor-pointer "
-              onClick={(e: React.MouseEvent<HTMLHeadingElement, MouseEvent>) =>
-                setStep("1")
-              }
-            >
+            <div className="flex items-center mb-5">
               <svg
                 version="1.1"
                 className={` h-8 mr-2 text-white fill-current  ${
-                  step === "1" ? " bg-blueLi rounded-full text-blueMa " : ""
+                  step === "1" ? " bg-blueLi rounded-full text-blue-900 " : ""
                 } `}
                 id="Layer_1"
                 xmlns="http://www.w3.org/2000/svg"
@@ -94,25 +131,18 @@ const Settings = () => {
               </svg>
               <div className="flex flex-col  ">
                 <p
-                  className={`  max-md:pl-3 text-xs text-grayCo ${
-                    step === "1" ? "setting relative " : ""
-                  } `}
+                  className={`  max-md:pl-3 text-sm text-grayCo`}
                 >
                   STEP 1
                 </p>
                 <p className={`max-md:pl-3  text-sm  `}>YOUR INFO</p>
               </div>
             </div>
-            <div
-              className="flex items-center mb-5 cursor-pointer "
-              onClick={(e: React.MouseEvent<HTMLHeadingElement, MouseEvent>) =>
-                setStep("2")
-              }
-            >
+            <div className="flex items-center mb-5">
               <svg
                 version="1.1"
                 className={` h-8 mr-2 text-white fill-current  ${
-                  step === "2" ? " bg-blueLi text-blueMa rounded-full  " : ""
+                  step === "2" ? " bg-blueLi text-blue-900 rounded-full  " : ""
                 } `}
                 id="Layer_1"
                 xmlns="http://www.w3.org/2000/svg"
@@ -126,25 +156,18 @@ const Settings = () => {
               </svg>
               <div className="flex flex-col  ">
                 <p
-                  className={`  max-md:pl-3 text-xs text-grayCo ${
-                    step === "2" ? "setting relative " : ""
-                  } `}
+                  className={`  max-md:pl-3 text-sm text-grayCo `}
                 >
                   STEP 2
                 </p>
                 <p className={`  max-md:pl-3  text-sm  `}>SELECT PLAN</p>
               </div>
             </div>
-            <div
-              className="flex items-center mb-5 cursor-pointer "
-              onClick={(e: React.MouseEvent<HTMLHeadingElement, MouseEvent>) =>
-                setStep("3")
-              }
-            >
+            <div className="flex items-center mb-5 ">
               <svg
                 version="1.1"
                 className={` h-8 mr-2 text-white fill-current  ${
-                  step === "3" ? " bg-blueLi rounded-full text-blueMa " : ""
+                  step === "3" ? " bg-blueLi rounded-full text-blue-900 " : ""
                 } `}
                 id="Layer_1"
                 xmlns="http://www.w3.org/2000/svg"
@@ -158,9 +181,7 @@ const Settings = () => {
               </svg>
               <div className="flex flex-col  ">
                 <p
-                  className={`  max-md:pl-3 text-xs text-grayCo ${
-                    step === "3" ? "setting relative " : ""
-                  } `}
+                  className={`  max-md:pl-3 text-sm text-grayCo  `}
                 >
                   STEP 3
                 </p>
@@ -168,15 +189,13 @@ const Settings = () => {
               </div>
             </div>
             <div
-              className="flex items-center mb-5 cursor-pointer "
-              onClick={(e: React.MouseEvent<HTMLHeadingElement, MouseEvent>) =>
-                setStep("4")
-              }
+              className="flex items-center mb-5 "
+              
             >
               <svg
                 version="1.1"
                 className={` h-8 mr-2 text-white fill-current  ${
-                  step === "4" ? " bg-blueLi rounded-full text-blueMa " : ""
+                  step === "4" || step === "5" ? " bg-blueLi rounded-full text-blue-900 " : ""
                 } `}
                 id="Layer_1"
                 xmlns="http://www.w3.org/2000/svg"
@@ -190,9 +209,7 @@ const Settings = () => {
               </svg>
               <div className="flex flex-col  ">
                 <p
-                  className={` max-md:pl-3 text-xs text-grayCo ${
-                    step === "4" ? "setting relative " : ""
-                  } `}
+                  className={` max-md:pl-3 text-sm text-grayCo`}
                 >
                   STEP 4
                 </p>
@@ -201,9 +218,9 @@ const Settings = () => {
             </div>
           </div>
         </div>
-        <div className=" mt-12 flex-[3] px-20  ">
+        <div className=" my-12 flex-[3] px-20 relative ">
           <form
-            className="flex flex-col text-blueMa font-normal "
+            className="flex flex-col text-blueMa font-normal"
             onSubmit={handleSubmit(onSubmit)}
           >
             {step === "1" && (
@@ -280,28 +297,40 @@ const Settings = () => {
                     Select your plan
                   </p>
                   <p className="text-grayCo">
-                    You have the option of monthly or yearly billing.
+                    You have the option of Monthly or Yearly billing.
                   </p>
                 </div>
-                <div className="flex space-x-5 mt-8 mb-12">
+                <div className="flex space-x-5 mt-8 mb-12 w-full">
                   <Cards
                     icon="../public/assets/images/icon-arcade.svg"
                     title="Arcade"
-                    price={9}
+                    price={
+                      billing == "Monthly"
+                        ? MofferPrices.Arcade
+                        : MofferPrices.Arcade * 10
+                    }
                     onClick={() => handleCardClick("Arcade")}
                     selected={offer === "Arcade"}
                   />
                   <Cards
                     icon="../public/assets/images/icon-advanced.svg"
                     title="Advanced"
-                    price={12}
+                    price={
+                      billing == "Monthly"
+                        ? MofferPrices.Advanced
+                        : MofferPrices.Advanced * 10
+                    }
                     onClick={() => handleCardClick("Advanced")}
                     selected={offer === "Advanced"}
                   />
                   <Cards
                     icon="../public/assets/images/icon-pro.svg"
                     title="Pro"
-                    price={15}
+                    price={
+                      billing == "Monthly"
+                        ? MofferPrices.Pro
+                        : MofferPrices.Pro * 10
+                    }
                     onClick={() => handleCardClick("Pro")}
                     selected={offer === "Pro"}
                   />
@@ -323,53 +352,151 @@ const Settings = () => {
                   <CheckboxCard
                     title="Online Service"
                     description="Access to multiplayer games"
-                    price={billing === "monthly" ? 1 : 10}
-                    checkboxKey="Online"
+                    price={
+                      billing === "Monthly"
+                        ? Mbilling["Online service"]
+                        : Mbilling["Online service"] * 10
+                    }
+                    checkboxKey="Online service"
                   />
                   <CheckboxCard
                     title="Larger Storage"
                     description="Extra 1TB of cloud save"
-                    price={billing === "monthly" ? 2 : 20}
-                    checkboxKey="Storage"
+                    price={
+                      billing === "Monthly"
+                        ? Mbilling["Larger storage"]
+                        : Mbilling["Larger storage"] * 10
+                    }
+                    checkboxKey="Larger storage"
                   />
                   <CheckboxCard
                     title="Customizable Profil"
                     description="Custom the on your profil"
-                    price={billing === "monthly" ? 2 : 20}
-                    checkboxKey="Custom"
+                    price={
+                      billing === "Monthly"
+                        ? Mbilling["Customizable profil"]
+                        : Mbilling["Customizable profil"] * 10
+                    }
+                    checkboxKey="Customizable profil"
                   />
                 </div>
               </div>
             )}
-            <div className="flex items-center justify-between">
+            {step === "4" && (
+              <div className=" flex flex-col">
+                <div>
+                  <p className="mb-1  block text-3xl font-bold text-blueMa">
+                    Finishing up
+                  </p>
+                  <p className="text-grayCo">
+                    Double-check everything looks OK before confirming.
+                  </p>
+                </div>
+                <section className="my-8 w-full bg-Magnolia rounded-md">
+                  <div className="px-6 ">
+                    <div className="flex justify-between items-center py-4 border-grayLi border-b-2">
+                      <div className="flex flex-col ">
+                        <p className="font-bold text-sm ">
+                          {offer} ({billing})
+                        </p>
+                        <span
+                          className="underline cursor-pointer text-sm font-medium text-grayCo"
+                          onClick={() => setStep("2")}
+                        >
+                          Change
+                        </span>
+                      </div>
+                      <span className="font-bold text-sm">{pricing()}</span>
+                    </div>
+                    <div className="py-4">
+                      {selectedAddOns.map((item, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between text-sm font-medium space-y-4"
+                        >
+                          <p className="text-grayCo">{item}</p>
+                          <span className="text-blueMa ">
+                            {billing === "Monthly"
+                              ? `+$${
+                                  Mbilling[item as keyof typeof Mbilling]
+                                }/mo`
+                              : `+$${
+                                  Mbilling[item as keyof typeof Mbilling] * 10
+                                }/yr`}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+                <div className="flex justify-between items-center px-6">
+                  <p className="text-grayCo text-sm font-medium">
+                    Total (per {billing === "Monthly" ? "month" : "year"})
+                  </p>
+                  <span className="text-xl font-bold text-bluePur">
+                    {Total()}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div
+              id="BUTTONS"
+              className={`absolute bottom-0 left-0 w-full bg-white px-20  flex  ${step==="1" ? "justify-end" : "justify-between"}`}
+            >
               {" "}
-              {/* {step !== "1" && ( */}
-              <button
-                className=" w-fit  active:bg-blueActive text-grayCo"
-                type="submit"
-              >
-                Go Back
-              </button>
-              {/* )} */}
+              {step !== "1" && step !== "5" && (
+                <button
+                  className=" w-fit  active:bg-blueActive text-grayCo"
+                  type="submit"
+                  onClick={(e) => {
+                    back();
+                  }}
+                >
+                  Go Back
+                </button>
+              )}
               {errors.root && (
                 <p className="text-red-500">{errors.root.message}</p>
               )}
-              <button
-                className={` bg-blueMa  text-white w-fit py-2 px-5 rounded-lg cursor-pointer self-end ${
-                  step === "2" && offer == null
-                    ? "bg-grayCo cursor-not-allowed"
-                    : ""
-                }`}
-                disabled={offer== null && step==="2"}
-                type="submit"
-                onClick={(e) => {
-                  next();
-                }}
-              >
-                Next Step
-              </button>
+              {step !== "5" && (
+                <button
+                  className={` bg-blueMa  text-white w-fit py-2 px-5 rounded-lg cursor-pointer self-end ${
+                    step === "4" ? "bg-bluePur" : ""
+                  } ${
+                    step === "2" && offer == null
+                      ? "bg-grayCo cursor-not-allowed"
+                      : ""
+                  }
+                  `}
+                  disabled={offer == null && step === "2"}
+                  type="submit"
+                  onClick={(e) => {
+                    next();
+                  }}
+                >
+                  {step == "4" ? "Confirmer" : "Next Step"}
+                </button>
+              )}
             </div>
           </form>
+          {step === "5" && (
+            <div className=" absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
+              <div className="flex flex-col items-center  space-y-6">
+                <img
+                  src="../public/assets/images/icon-thank-you.svg"
+                  alt="thankyou"
+                  className="h-16"
+                />
+                <p className="font-bold text-3xl"> Thank you !</p>
+                <p className="text-grayCo text-center">
+                  Thanks for confirming your subscription! We hope you have fun
+                  using our platform. If you ever need support, please feel free
+                  to email us at support@loremgaming.com.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </div>
