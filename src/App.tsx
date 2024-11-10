@@ -122,7 +122,7 @@ const Settings = () => {
                 <svg
                   version="1.1"
                   className={` h-8 mr-2 text-white fill-current  ${
-                    step === "1" ? " bg-blueLi rounded-full text-blue-900 " : ""
+                    step === "1" ? " bg-blueLi rounded-full text-blueMa " : ""
                   } `}
                   id="Layer_1"
                   xmlns="http://www.w3.org/2000/svg"
