@@ -15,6 +15,18 @@ module.exports = {
         Alabaster: "#fafbff",
         White: "#ffffff",
       },
+      fontSize: {
+        title: `2.6rem;`,
+        paragraph: `1.2rem;`,
+      },
+      fontWeight: {
+        light: 400,
+        normal: 500,
+        bold: 700,
+      },
+      fontFamily: {
+        ubuntu: ["Ubuntu", "sans-serif"], 
+      },
     },
     plugins: [],
   },

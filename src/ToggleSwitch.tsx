@@ -7,7 +7,7 @@ const PricingToggle: React.FC = () => {
   const { billing, togglePricing } = useOfferState();
 
   return (
-    <div className="flex bg-Alabaster items-center justify-center py-2 space-x-5 text-sm font-semibold rounded-lg">
+    <div className="flex bg-Alabaster items-center justify-center py-2 space-x-5 text-sm font-normal rounded-lg">
       <p
         className={`
             ${billing === "Yearly" ? "text-grayCo" : ""}
